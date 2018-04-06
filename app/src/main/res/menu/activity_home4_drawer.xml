@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/general_sms"
+            android:title="General Sms" />
+        <item
+            android:id="@+id/attendance_sms"
+            android:title="Attendance Sms" />
+        <item
+            android:id="@+id/result_sms"
+            android:title="Result Sms" />
+        <item
+            android:id="@+id/fees_sms"
+            android:title="Fees Sms" />
+
+    </group>
+    <item android:title="Save data">
+        <menu>
+            <item
+                android:id="@+id/import_data"
+                android:icon="@drawable/import_icon"
+                android:title="Import" />
+        </menu>
+    </item>
+
+</menu>
