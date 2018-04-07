@@ -2,6 +2,7 @@ package com.example.osamakhalid.simsadmin.ui.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,12 +24,15 @@ import com.example.osamakhalid.simsadmin.consts.Values;
 import com.example.osamakhalid.simsadmin.db.StudentDbHelper;
 import com.example.osamakhalid.simsadmin.globalcalls.CommonCalls;
 import com.example.osamakhalid.simsadmin.model.Class;
+import com.example.osamakhalid.simsadmin.model.ClassDataProvider;
 import com.example.osamakhalid.simsadmin.model.ClassesList;
 import com.example.osamakhalid.simsadmin.model.LoginResponse;
 import com.example.osamakhalid.simsadmin.model.Section;
+import com.example.osamakhalid.simsadmin.model.SectionDataProvider;
 import com.example.osamakhalid.simsadmin.model.SectionsList;
 import com.example.osamakhalid.simsadmin.model.StudentData;
 import com.example.osamakhalid.simsadmin.model.StudentDataList;
+import com.example.osamakhalid.simsadmin.model.StudentDataProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +59,11 @@ public class ImportDataFragment extends Fragment {
     List<Section> sectionsData;
     ProgressDialog progressDialog;
     LoginResponse userData;
+    Cursor cursor;
     StudentDbHelper studentDbHelper;
     SQLiteDatabase sqLiteDatabase;
+    List<ClassDataProvider> classDataProviderList;
+    List<SectionDataProvider> sectionDataProviderList;
 
     public ImportDataFragment() {
         // Required empty public constructor
@@ -71,19 +78,21 @@ public class ImportDataFragment extends Fragment {
         classesSpinner = view.findViewById(R.id.import_classes_spinner);
         sectionsSpinner = view.findViewById(R.id.import_sections_spinner);
         importButton = view.findViewById(R.id.import_button);
+        classDataProviderList = new ArrayList<>();
+        sectionDataProviderList = new ArrayList<>();
         userData = CommonCalls.getUserData(getActivity());
         getClassesList();
         importButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveInfoInDatabase();
+                // saveInfoInDatabase();
                 Toast.makeText(getActivity(), "Data imported successfully.", Toast.LENGTH_SHORT).show();
             }
         });
         classesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                spinnerValueClassId = classListItems.get(i).getClassesID();
+                spinnerValueClassId = classDataProviderList.get(i).getClassId();
                 getSections(spinnerValueClassId);
             }
 
@@ -108,44 +117,24 @@ public class ImportDataFragment extends Fragment {
         return view;
     }
 
-    public void saveInfoInDatabase() {
-        studentDbHelper = new StudentDbHelper(getActivity().getApplicationContext());
-        sqLiteDatabase = studentDbHelper.getWritableDatabase();
-        for (StudentData data : studentDataList) {
-            studentDbHelper.addInformation(data.getStudentID(), data.getName(), data.getPhone(), data.getClassesID()
-                    , data.getSectionID(), sqLiteDatabase);
-        }
-    }
+//    public void saveInfoInDatabase() {
+//        studentDbHelper = new StudentDbHelper(getActivity().getApplicationContext());
+//        sqLiteDatabase = studentDbHelper.getWritableDatabase();
+//        for (StudentData data : studentDataList) {
+//            studentDbHelper.addInformation(data.getStudentID(), data.getName(), data.getPhone(), data.getClassesID()
+//                    , data.getSectionID(), sqLiteDatabase);
+//        }
+//    }
 
     public void getSections(String classId) {
-        progressDialog = CommonCalls.createDialouge(getActivity(), "", Values.WAIT_MSG);
-        Retrofit retrofit = RetrofitInitialize.getApiClient();
-        ClientAPIs clientAPIs = retrofit.create(ClientAPIs.class);
-        String base = userData.getUsername() + ":" + userData.getPassword();
-        String authHeader = "Basic " + Base64.encodeToString(base.getBytes(), Base64.NO_WRAP);
-        Call<SectionsList> call = clientAPIs.getSections(classId, authHeader);
-        call.enqueue(new Callback<SectionsList>() {
-            @Override
-            public void onResponse(Call<SectionsList> call, Response<SectionsList> response) {
-                if (response.isSuccessful()) {
-                    SectionsList sectionsList = response.body();
-                    progressDialog.dismiss();
-                    if (sectionsList != null && sectionsList.getSectionData() != null) {
-                        sectionsData = sectionsList.getSectionData();
-                        getSectionsName(sectionsData);
-                    }
-                } else {
-                    progressDialog.dismiss();
-                    Toast.makeText(getActivity(), Values.DATA_ERROR, Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<SectionsList> call, Throwable t) {
-                progressDialog.dismiss();
-                Toast.makeText(getActivity(), Values.SERVER_ERROR, Toast.LENGTH_SHORT).show();
-            }
-        });
+        sqLiteDatabase = studentDbHelper.getReadableDatabase();
+        cursor = studentDbHelper.getInformationFromSectionTable(sqLiteDatabase, classId);
+        if (cursor.moveToFirst()) {
+            do {
+                classDataProviderList.add(new ClassDataProvider(String.valueOf(cursor.getInt(0))
+                        , cursor.getString(1), cursor.getString(2), cursor.getString(3)));
+            } while (cursor.moveToNext());
+        }
     }
 
     public void getSectionsName(List<Section> sectionsLists) {
@@ -191,10 +180,23 @@ public class ImportDataFragment extends Fragment {
         });
     }
 
-    public void getClassesNames(List<Class> classes) {
+
+    public void getClassesList() {
+        sqLiteDatabase = studentDbHelper.getReadableDatabase();
+        cursor = studentDbHelper.getInformationFromClassTable(sqLiteDatabase);
+        if (cursor.moveToFirst()) {
+            do {
+                classDataProviderList.add(new ClassDataProvider(String.valueOf(cursor.getInt(0))
+                        , cursor.getString(1), cursor.getString(2), cursor.getString(3)));
+            } while (cursor.moveToNext());
+        }
+        setValuesToClassSpinner();
+    }
+
+    public void setValuesToClassSpinner() {
         List<String> classesNames = new ArrayList<>();
-        for (Class data : classes) {
-            classesNames.add(data.getClasses());
+        for (ClassDataProvider data : classDataProviderList) {
+            classesNames.add(data.getClassName());
         }
         android.widget.ArrayAdapter<String> ArrayAdapter = new ArrayAdapter
                 (getActivity(), android.R.layout.simple_spinner_item, classesNames);
@@ -202,36 +204,6 @@ public class ImportDataFragment extends Fragment {
         classesSpinner.setAdapter(ArrayAdapter);
     }
 
-    public void getClassesList() {
-        progressDialog = CommonCalls.createDialouge(getActivity(), "", Values.WAIT_MSG);
-        Retrofit retrofit = RetrofitInitialize.getApiClient();
-        ClientAPIs clientAPIs = retrofit.create(ClientAPIs.class);
-        String base = userData.getUsername() + ":" + userData.getPassword();
-        String authHeader = "Basic " + Base64.encodeToString(base.getBytes(), Base64.NO_WRAP);
-        Call<ClassesList> call = clientAPIs.getClasses(authHeader);
-        call.enqueue(new Callback<ClassesList>() {
-            @Override
-            public void onResponse(Call<ClassesList> call, Response<ClassesList> response) {
-                if (response.isSuccessful()) {
-                    ClassesList classesList = response.body();
-                    progressDialog.dismiss();
-                    if (classesList != null && classesList.getClassesData() != null) {
-                        classListItems = classesList.getClassesData();
-                        getClassesNames(classListItems);
-                    }
-                } else {
-                    progressDialog.dismiss();
-                    Toast.makeText(getActivity(), Values.DATA_ERROR, Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ClassesList> call, Throwable t) {
-                progressDialog.dismiss();
-                Toast.makeText(getActivity(), Values.SERVER_ERROR, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

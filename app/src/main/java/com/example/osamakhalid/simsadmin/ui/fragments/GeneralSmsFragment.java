@@ -93,7 +93,7 @@ public class GeneralSmsFragment extends Fragment {
             public void onClick(View view) {
                 sendButton.setEnabled(false);
                 sendButton.setText("Sending...");
-                fetchDataFromDatabase();
+               // fetchDataFromDatabase();
                 sendButton.setEnabled(true);
                 sendButton.setText("Send");
             }
@@ -101,18 +101,18 @@ public class GeneralSmsFragment extends Fragment {
         return view;
     }
 
-    public void fetchDataFromDatabase() {
-        sqLiteDatabase = studentDbHelper.getReadableDatabase();
-        cursor = studentDbHelper.getInformation(sqLiteDatabase);
-        if (cursor.moveToFirst()) {
-            do {
-                dataProviderList.add(new StudentDataProvider(String.valueOf(cursor.getInt(0)), cursor.getString(1)
-                        , cursor.getString(2), cursor.getString(3), cursor.getString(4)));
-                System.out.println("logg data fetch");
-            } while (cursor.moveToNext());
-        }
-        sendMessagesToStudents(dataProviderList);
-    }
+//    public void fetchDataFromDatabase() {
+//        sqLiteDatabase = studentDbHelper.getReadableDatabase();
+//        cursor = studentDbHelper.getInformation(sqLiteDatabase);
+//        if (cursor.moveToFirst()) {
+//            do {
+//                dataProviderList.add(new StudentDataProvider(String.valueOf(cursor.getInt(0)), cursor.getString(1)
+//                        , cursor.getString(2), cursor.getString(3), cursor.getString(4)));
+//                System.out.println("logg data fetch");
+//            } while (cursor.moveToNext());
+//        }
+//        sendMessagesToStudents(dataProviderList);
+//    }
 
     public void sendMessagesToStudents(final List<StudentDataProvider> dataProviderList) {
         String SENT = "SMS_SENT";

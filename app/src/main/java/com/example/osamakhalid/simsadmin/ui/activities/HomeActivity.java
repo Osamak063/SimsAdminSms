@@ -9,16 +9,35 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.osamakhalid.simsadmin.R;
+import com.example.osamakhalid.simsadmin.baseconnection.RetrofitInitialize;
+import com.example.osamakhalid.simsadmin.connectioninterface.ClientAPIs;
+import com.example.osamakhalid.simsadmin.consts.Values;
 import com.example.osamakhalid.simsadmin.db.StudentDbHelper;
+import com.example.osamakhalid.simsadmin.globalcalls.CommonCalls;
+import com.example.osamakhalid.simsadmin.model.Class;
+import com.example.osamakhalid.simsadmin.model.ClassesList;
+import com.example.osamakhalid.simsadmin.model.LoginResponse;
+import com.example.osamakhalid.simsadmin.model.Section;
+import com.example.osamakhalid.simsadmin.model.SectionsList;
+import com.example.osamakhalid.simsadmin.model.StudentData;
 import com.example.osamakhalid.simsadmin.ui.fragments.AttendanceSmsFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.FeesSmsFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.GeneralSmsFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.ImportDataFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.ResultSmsFragment;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -28,6 +47,11 @@ public class HomeActivity extends AppCompatActivity
         , FeesSmsFragment.OnFragmentInteractionListener
         , ImportDataFragment.OnFragmentInteractionListener {
 
+    LoginResponse userData;
+    List<Class> classListItems;
+    List<Section> sectionListItems;
+    StudentDbHelper DBHelper;
+    SQLiteDatabase sqLiteDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +68,90 @@ public class HomeActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        userData = CommonCalls.getUserData(HomeActivity.this);
+        if (sectionListItems != null) {
+            if (sectionListItems.size() > 0) {
+                sectionListItems.clear();
+            }
+        }
+        getDefaultData();
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.container_fragment, new GeneralSmsFragment())
                 .commit();
+    }
+
+    public void getDefaultData() {
+        Retrofit retrofit = RetrofitInitialize.getApiClient();
+        ClientAPIs clientAPIs = retrofit.create(ClientAPIs.class);
+        String base = userData.getUsername() + ":" + userData.getPassword();
+        String authHeader = "Basic " + Base64.encodeToString(base.getBytes(), Base64.NO_WRAP);
+        Call<ClassesList> call = clientAPIs.getClasses(authHeader);
+        call.enqueue(new Callback<ClassesList>() {
+            @Override
+            public void onResponse(Call<ClassesList> call, Response<ClassesList> response) {
+                if (response.isSuccessful()) {
+                    ClassesList classesList = response.body();
+                    if (classesList != null && classesList.getClassesData() != null) {
+                        classListItems = classesList.getClassesData();
+                        getSectionsList(classListItems);
+                    }
+                } else {
+                    Toast.makeText(HomeActivity.this, Values.DATA_ERROR, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ClassesList> call, Throwable t) {
+                Toast.makeText(HomeActivity.this, Values.SERVER_ERROR, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void getSectionsList(List<Class> classes) {
+        for (Class classData : classes) {
+            getSections(classData.getClassesID());
+        }
+        saveInfoInDatabase();
+    }
+
+    public void saveInfoInDatabase() {
+        DBHelper = new StudentDbHelper(HomeActivity.this);
+        sqLiteDatabase = DBHelper.getWritableDatabase();
+        for (Class data : classListItems) {
+            DBHelper.addInformationToClassTable(data.getClassesID(), data.getClasses(), data.getClassesNumeric()
+                    , data.getTeacherID(), sqLiteDatabase);
+        }
+        for (Section data : sectionListItems) {
+            DBHelper.addInformationToSectionTable(data.getSectionID(), data.getSection(), data.getCategory()
+                    , data.getClassesID(), sqLiteDatabase);
+        }
+    }
+
+    public void getSections(String classId) {
+        Retrofit retrofit = RetrofitInitialize.getApiClient();
+        ClientAPIs clientAPIs = retrofit.create(ClientAPIs.class);
+        String base = userData.getUsername() + ":" + userData.getPassword();
+        String authHeader = "Basic " + Base64.encodeToString(base.getBytes(), Base64.NO_WRAP);
+        Call<SectionsList> call = clientAPIs.getSections(classId, authHeader);
+        call.enqueue(new Callback<SectionsList>() {
+            @Override
+            public void onResponse(Call<SectionsList> call, Response<SectionsList> response) {
+                if (response.isSuccessful()) {
+                    SectionsList sectionsList = response.body();
+                    if (sectionsList != null && sectionsList.getSectionData() != null) {
+                        sectionListItems.addAll(sectionsList.getSectionData());
+                    }
+                } else {
+                    Toast.makeText(HomeActivity.this, Values.DATA_ERROR, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SectionsList> call, Throwable t) {
+                Toast.makeText(HomeActivity.this, Values.SERVER_ERROR, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
