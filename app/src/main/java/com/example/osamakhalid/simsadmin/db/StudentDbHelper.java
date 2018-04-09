@@ -82,12 +82,12 @@ public class StudentDbHelper extends SQLiteOpenHelper {
         contentValues.put(StudentContract.NewSectionInfo.SECTION_NAME, sectionName);
         contentValues.put(StudentContract.NewSectionInfo.CATEGORY, category);
         contentValues.put(StudentContract.NewSectionInfo.SECTION_CLASSES_ID, sectionClassId);
-        sqLiteDatabase.insertWithOnConflict(StudentContract.NewStudentInfo.TABLE_NAME, null
+        sqLiteDatabase.insertWithOnConflict(StudentContract.NewSectionInfo.TABLE_NAME, null
                 , contentValues, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
 
-    public Cursor getInformationFromStudentTable(SQLiteDatabase sqLiteDatabase) {
+    public Cursor getInformationFromStudentTable(SQLiteDatabase sqLiteDatabase, String classId, String sectionId) {
         Cursor cursor;
         String[] projections = {StudentContract.NewStudentInfo.STUDENT_ID, StudentContract.NewStudentInfo.NAME
                 , StudentContract.NewStudentInfo.DOB, StudentContract.NewStudentInfo.SEX
@@ -95,7 +95,9 @@ public class StudentDbHelper extends SQLiteOpenHelper {
                 , StudentContract.NewStudentInfo.ADDRESS, StudentContract.NewStudentInfo.STUDENT_CLASSES_ID
                 , StudentContract.NewStudentInfo.STUDENT_SECTION_ID, StudentContract.NewStudentInfo.STUDENT_SECTION_NAME
                 , StudentContract.NewStudentInfo.STUDENT_PARENT_ID, StudentContract.NewStudentInfo.STUDENT_ACTIVE};
-        cursor = sqLiteDatabase.query(StudentContract.NewStudentInfo.TABLE_NAME, projections, null, null, null, null, null);
+        cursor = sqLiteDatabase.query(StudentContract.NewStudentInfo.TABLE_NAME, projections
+                , StudentContract.NewStudentInfo.STUDENT_CLASSES_ID + "=" + classId + " AND "
+                        + StudentContract.NewStudentInfo.STUDENT_SECTION_ID + "=" + sectionId, null, null, null, null);
         return cursor;
     }
 
@@ -103,16 +105,26 @@ public class StudentDbHelper extends SQLiteOpenHelper {
         Cursor cursor;
         String[] projections = {StudentContract.NewClassInfo.CLASSES_ID, StudentContract.NewClassInfo.CLASS_NAME
                 , StudentContract.NewClassInfo.CLASSES_NAME_NUMERIC, StudentContract.NewClassInfo.CLASS_TEACHER_ID};
-        cursor = sqLiteDatabase.query(StudentContract.NewStudentInfo.TABLE_NAME, projections, null, null, null, null, null);
+        cursor = sqLiteDatabase.query(StudentContract.NewClassInfo.TABLE_NAME, projections, null, null, null, null, null);
         return cursor;
     }
 
-    public Cursor getInformationFromSectionTable(SQLiteDatabase sqLiteDatabase, String classId) {
+    public Cursor getInformationFromSectionTableWithClassId(SQLiteDatabase sqLiteDatabase, String classId) {
         Cursor cursor;
         String[] projections = {StudentContract.NewSectionInfo.SECTION_ID, StudentContract.NewSectionInfo.SECTION_NAME
                 , StudentContract.NewSectionInfo.CATEGORY, StudentContract.NewSectionInfo.SECTION_CLASSES_ID};
-        cursor = sqLiteDatabase.query(StudentContract.NewStudentInfo.TABLE_NAME, projections
+        cursor = sqLiteDatabase.query(StudentContract.NewSectionInfo.TABLE_NAME, projections
                 , StudentContract.NewSectionInfo.SECTION_CLASSES_ID + "=" + classId
+                , null, null, null, null);
+        return cursor;
+    }
+
+    public Cursor getInformationFromSectionTable(SQLiteDatabase sqLiteDatabase) {
+        Cursor cursor;
+        String[] projections = {StudentContract.NewSectionInfo.SECTION_ID, StudentContract.NewSectionInfo.SECTION_NAME
+                , StudentContract.NewSectionInfo.CATEGORY, StudentContract.NewSectionInfo.SECTION_CLASSES_ID};
+        cursor = sqLiteDatabase.query(StudentContract.NewSectionInfo.TABLE_NAME, projections
+                , null
                 , null, null, null, null);
         return cursor;
     }

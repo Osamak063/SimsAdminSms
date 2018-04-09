@@ -17,7 +17,21 @@
             android:layout_height="match_parent"
             android:layout_margin="20dp"
             android:orientation="vertical">
+            <Spinner
+                android:id="@+id/import_classes_spinner"
+                android:layout_margin="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/spinner_color"></Spinner>
 
+            <Spinner
+                android:id="@+id/import_sections_spinner"
+                android:layout_margin="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/spinner_color"></Spinner>
 
             <EditText
                 android:id="@+id/message_content"

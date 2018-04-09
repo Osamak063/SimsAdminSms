@@ -11,7 +11,6 @@ public class SectionDataProvider {
     String sectionClassId;
 
     public SectionDataProvider(String sectionId, String sectionName, String category, String sectionClassId) {
-
         this.sectionId = sectionId;
         this.sectionName = sectionName;
         this.category = category;

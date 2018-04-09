@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
@@ -32,9 +33,11 @@ import com.example.osamakhalid.simsadmin.db.StudentDbHelper;
 import com.example.osamakhalid.simsadmin.globalcalls.CommonCalls;
 import com.example.osamakhalid.simsadmin.R;
 import com.example.osamakhalid.simsadmin.model.Class;
+import com.example.osamakhalid.simsadmin.model.ClassDataProvider;
 import com.example.osamakhalid.simsadmin.model.ClassesList;
 import com.example.osamakhalid.simsadmin.model.LoginResponse;
 import com.example.osamakhalid.simsadmin.model.Section;
+import com.example.osamakhalid.simsadmin.model.SectionDataProvider;
 import com.example.osamakhalid.simsadmin.model.SectionsList;
 import com.example.osamakhalid.simsadmin.model.StudentData;
 import com.example.osamakhalid.simsadmin.model.StudentDataList;
@@ -68,9 +71,14 @@ public class GeneralSmsFragment extends Fragment {
     List<Section> sectionsData;
     int num = 0;
     Cursor cursor;
+    List<StudentDataProvider> studentDataProviderList;
     StudentDbHelper studentDbHelper;
     SQLiteDatabase sqLiteDatabase;
-    List<StudentDataProvider> dataProviderList;
+    List<ClassDataProvider> classDataProviderList;
+    List<SectionDataProvider> sectionDataProviderList;
+    Spinner classesSpinner, sectionsSpinner;
+    StudentDataProvider studentDataForMsg;
+    PendingIntent sentPI;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,42 +89,131 @@ public class GeneralSmsFragment extends Fragment {
         }
         View view = inflater.inflate(R.layout.fragment_general_sms, container, false);
         messageContent = view.findViewById(R.id.message_content);
+        classesSpinner = view.findViewById(R.id.import_classes_spinner);
+        sectionsSpinner = view.findViewById(R.id.import_sections_spinner);
         sendButton = view.findViewById(R.id.send_button);
         studentDbHelper = new StudentDbHelper(getActivity().getApplicationContext());
         classesNames = new ArrayList<>();
-        dataProviderList = new ArrayList<>();
+        studentDataProviderList = new ArrayList<>();
+        classDataProviderList = new ArrayList<>();
+        sectionDataProviderList = new ArrayList<>();
         userData = CommonCalls.getUserData(getActivity());
         sendButton.setText("Send");
-
+        getClassesList();
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                sendMessagesToStudents(studentDataProviderList);
                 sendButton.setEnabled(false);
                 sendButton.setText("Sending...");
-               // fetchDataFromDatabase();
-                sendButton.setEnabled(true);
-                sendButton.setText("Send");
+                if (studentDataProviderList.size() == 0) {
+                    sendButton.setEnabled(true);
+                    sendButton.setText("Send");
+                }
+
+            }
+        });
+
+        classesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                spinnerValueClassId = classDataProviderList.get(i).getClassId();
+                getSections(spinnerValueClassId);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        sectionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                spinnerValueSectionsId = sectionDataProviderList.get(i).getSectionId();
+                getStudents(spinnerValueClassId, spinnerValueSectionsId);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
         return view;
     }
 
-//    public void fetchDataFromDatabase() {
-//        sqLiteDatabase = studentDbHelper.getReadableDatabase();
-//        cursor = studentDbHelper.getInformation(sqLiteDatabase);
-//        if (cursor.moveToFirst()) {
-//            do {
-//                dataProviderList.add(new StudentDataProvider(String.valueOf(cursor.getInt(0)), cursor.getString(1)
-//                        , cursor.getString(2), cursor.getString(3), cursor.getString(4)));
-//                System.out.println("logg data fetch");
-//            } while (cursor.moveToNext());
-//        }
-//        sendMessagesToStudents(dataProviderList);
-//    }
+    public void getStudents(String classId, String sectionId) {
+        sqLiteDatabase = studentDbHelper.getReadableDatabase();
+        studentDataProviderList.clear();
+        cursor = studentDbHelper.getInformationFromStudentTable(sqLiteDatabase, classId, sectionId);
+        if (cursor.moveToFirst()) {
+            do {
+                studentDataProviderList.add(new StudentDataProvider(String.valueOf(cursor.getInt(0))
+                        , cursor.getString(1), cursor.getString(2), cursor.getString(3)
+                        , cursor.getString(4), cursor.getString(5), cursor.getString(6)
+                        , cursor.getString(7), cursor.getString(8), cursor.getString(9)
+                        , cursor.getString(10), cursor.getString(11)));
+            } while (cursor.moveToNext());
+        }
+        if (studentDataProviderList.size() == 0) {
+            Toast.makeText(getActivity(), "Students not available", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void getClassesList() {
+        sqLiteDatabase = studentDbHelper.getReadableDatabase();
+        cursor = studentDbHelper.getInformationFromClassTable(sqLiteDatabase);
+        if (cursor.moveToFirst()) {
+            do {
+                classDataProviderList.add(new ClassDataProvider(String.valueOf(cursor.getInt(0))
+                        , cursor.getString(1), cursor.getString(2), cursor.getString(3)));
+            } while (cursor.moveToNext());
+        }
+        setValuesToClassSpinner();
+    }
+
+    public void setValuesToClassSpinner() {
+        List<String> classesNames = new ArrayList<>();
+        for (ClassDataProvider data : classDataProviderList) {
+            classesNames.add(data.getClassName());
+        }
+        android.widget.ArrayAdapter<String> ArrayAdapter = new ArrayAdapter
+                (getActivity(), android.R.layout.simple_spinner_item, classesNames);
+        ArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        classesSpinner.setAdapter(ArrayAdapter);
+    }
+
+    public void getSections(String classId) {
+        sectionDataProviderList.clear();
+        sqLiteDatabase = studentDbHelper.getReadableDatabase();
+        cursor = studentDbHelper.getInformationFromSectionTableWithClassId(sqLiteDatabase, classId);
+        if (cursor.moveToFirst()) {
+            do {
+                sectionDataProviderList.add(new SectionDataProvider(String.valueOf(cursor.getInt(0))
+                        , cursor.getString(1), cursor.getString(2), cursor.getString(3)));
+            } while (cursor.moveToNext());
+        }
+        System.out.println("logg sections data provider list coming from database size=" + sectionDataProviderList.size());
+        setValueToSectionSpinner();
+    }
+
+    public void setValueToSectionSpinner() {
+        List<String> sectionsNames = new ArrayList<>();
+        for (SectionDataProvider data : sectionDataProviderList) {
+            sectionsNames.add(data.getSectionName());
+        }
+        android.widget.ArrayAdapter<String> ArrayAdapter = new ArrayAdapter
+                (getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, sectionsNames);
+        ArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sectionsSpinner.setAdapter(ArrayAdapter);
+    }
+
 
     public void sendMessagesToStudents(final List<StudentDataProvider> dataProviderList) {
+        Handler handler = new Handler();
+        int delayMultiplier = 0;
         String SENT = "SMS_SENT";
-        PendingIntent sentPI = PendingIntent.getBroadcast(getActivity().getApplicationContext(), 0, new Intent(SENT), 0);
+        sentPI = PendingIntent.getBroadcast(getActivity().getApplicationContext(), 0, new Intent(SENT), 0);
         getActivity().getApplicationContext().registerReceiver(
                 new BroadcastReceiver() {
                     @Override
@@ -155,9 +252,21 @@ public class GeneralSmsFragment extends Fragment {
         }
         Toast.makeText(getActivity(), "Sending messages to imported students.", Toast.LENGTH_SHORT).show();
         for (StudentDataProvider data : dataProviderList) {
-            SmsManager sms = SmsManager.getDefault();
-            System.out.println("logg sending msg=" + messageContent.getText().toString() + " number=" + data.getMob());
-            sms.sendTextMessage(data.getMob(), null, messageContent.getText().toString(), sentPI, null);
+            final String phone=data.getMob();
+            ++delayMultiplier;
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        SmsManager sms = SmsManager.getDefault();
+                        System.out.println("logg sending msg=" + messageContent.getText().toString() + " number=" + phone);
+                        sms.sendTextMessage(phone, null, messageContent.getText().toString(), sentPI, null);
+                    } catch (Exception e) {
+                        System.out.println("logg exception=" + e.getLocalizedMessage());
+                    }
+                }
+            }, delayMultiplier*5000);
+
         }
         dataProviderList.clear();
     }

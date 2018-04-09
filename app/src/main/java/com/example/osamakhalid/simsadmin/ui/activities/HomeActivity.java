@@ -1,5 +1,6 @@
 package com.example.osamakhalid.simsadmin.ui.activities;
 
+import android.app.ProgressDialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.example.osamakhalid.simsadmin.ui.fragments.GeneralSmsFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.ImportDataFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.ResultSmsFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -52,6 +54,8 @@ public class HomeActivity extends AppCompatActivity
     List<Section> sectionListItems;
     StudentDbHelper DBHelper;
     SQLiteDatabase sqLiteDatabase;
+    int apiCallsNum = 0;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,16 +73,15 @@ public class HomeActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         userData = CommonCalls.getUserData(HomeActivity.this);
+        sectionListItems = new ArrayList<>();
+        classListItems = new ArrayList<>();
+        progressDialog = CommonCalls.createDialouge(HomeActivity.this,"" ,Values.WAIT_MSG);
         if (sectionListItems != null) {
             if (sectionListItems.size() > 0) {
                 sectionListItems.clear();
             }
         }
         getDefaultData();
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container_fragment, new GeneralSmsFragment())
-                .commit();
     }
 
     public void getDefaultData() {
@@ -94,6 +97,7 @@ public class HomeActivity extends AppCompatActivity
                     ClassesList classesList = response.body();
                     if (classesList != null && classesList.getClassesData() != null) {
                         classListItems = classesList.getClassesData();
+                        saveClassesListToDatabase();
                         getSectionsList(classListItems);
                     }
                 } else {
@@ -108,27 +112,33 @@ public class HomeActivity extends AppCompatActivity
         });
     }
 
-    public void getSectionsList(List<Class> classes) {
-        for (Class classData : classes) {
-            getSections(classData.getClassesID());
-        }
-        saveInfoInDatabase();
-    }
-
-    public void saveInfoInDatabase() {
+    public void saveClassesListToDatabase() {
         DBHelper = new StudentDbHelper(HomeActivity.this);
         sqLiteDatabase = DBHelper.getWritableDatabase();
         for (Class data : classListItems) {
             DBHelper.addInformationToClassTable(data.getClassesID(), data.getClasses(), data.getClassesNumeric()
                     , data.getTeacherID(), sqLiteDatabase);
         }
-        for (Section data : sectionListItems) {
+    }
+
+    public void getSectionsList(List<Class> classes) {
+        for (Class classData : classes) {
+            System.out.println("logg get sections list in loop");
+            getSections(classData.getClassesID());
+        }
+    }
+
+    public void saveSectionsListToDatabase(List<Section> sectionList) {
+        DBHelper = new StudentDbHelper(HomeActivity.this);
+        sqLiteDatabase = DBHelper.getWritableDatabase();
+        for (Section data : sectionList) {
             DBHelper.addInformationToSectionTable(data.getSectionID(), data.getSection(), data.getCategory()
                     , data.getClassesID(), sqLiteDatabase);
         }
     }
 
     public void getSections(String classId) {
+        final List<Section> sectionList = new ArrayList<>();
         Retrofit retrofit = RetrofitInitialize.getApiClient();
         ClientAPIs clientAPIs = retrofit.create(ClientAPIs.class);
         String base = userData.getUsername() + ":" + userData.getPassword();
@@ -140,7 +150,17 @@ public class HomeActivity extends AppCompatActivity
                 if (response.isSuccessful()) {
                     SectionsList sectionsList = response.body();
                     if (sectionsList != null && sectionsList.getSectionData() != null) {
-                        sectionListItems.addAll(sectionsList.getSectionData());
+                        sectionList.addAll(sectionsList.getSectionData());
+                        ++apiCallsNum;
+                        System.out.println("logg section list size=" + sectionList.size());
+                        saveSectionsListToDatabase(sectionList);
+                        if (apiCallsNum == classListItems.size()) {
+                            progressDialog.dismiss();
+                            getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.container_fragment, new GeneralSmsFragment())
+                                    .commit();
+                        }
                     }
                 } else {
                     Toast.makeText(HomeActivity.this, Values.DATA_ERROR, Toast.LENGTH_SHORT).show();

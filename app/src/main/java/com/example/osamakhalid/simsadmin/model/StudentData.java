@@ -58,16 +58,16 @@ public class StudentData {
     private String createDate;
     @SerializedName("totalamount")
     @Expose
-    private Object totalamount;
+    private String totalamount;
     @SerializedName("paidamount")
     @Expose
-    private Object paidamount;
+    private String paidamount;
     @SerializedName("photo")
     @Expose
-    private Object photo;
+    private String photo;
     @SerializedName("parentID")
     @Expose
-    private Object parentID;
+    private String parentID;
     @SerializedName("year")
     @Expose
     private String year;
@@ -224,35 +224,35 @@ public class StudentData {
         this.createDate = createDate;
     }
 
-    public Object getTotalamount() {
+    public String getTotalamount() {
         return totalamount;
     }
 
-    public void setTotalamount(Object totalamount) {
+    public void setTotalamount(String totalamount) {
         this.totalamount = totalamount;
     }
 
-    public Object getPaidamount() {
+    public String getPaidamount() {
         return paidamount;
     }
 
-    public void setPaidamount(Object paidamount) {
+    public void setPaidamount(String paidamount) {
         this.paidamount = paidamount;
     }
 
-    public Object getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Object photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 
-    public Object getParentID() {
+    public String getParentID() {
         return parentID;
     }
 
-    public void setParentID(Object parentID) {
+    public void setParentID(String parentID) {
         this.parentID = parentID;
     }
 

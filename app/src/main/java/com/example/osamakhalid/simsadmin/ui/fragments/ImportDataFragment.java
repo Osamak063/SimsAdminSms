@@ -80,13 +80,18 @@ public class ImportDataFragment extends Fragment {
         importButton = view.findViewById(R.id.import_button);
         classDataProviderList = new ArrayList<>();
         sectionDataProviderList = new ArrayList<>();
+        studentDbHelper = new StudentDbHelper(getActivity());
         userData = CommonCalls.getUserData(getActivity());
         getClassesList();
         importButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // saveInfoInDatabase();
+                importButton.setEnabled(false);
+                importButton.setText("Importing");
+                saveStudentsDataToDatabase();
                 Toast.makeText(getActivity(), "Data imported successfully.", Toast.LENGTH_SHORT).show();
+                importButton.setText("Import");
+                importButton.setEnabled(true);
             }
         });
         classesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -105,7 +110,7 @@ public class ImportDataFragment extends Fragment {
         sectionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                spinnerValueSectionsId = sectionsData.get(i).getSectionID();
+                spinnerValueSectionsId = sectionDataProviderList.get(i).getSectionId();
                 getStudents(spinnerValueClassId, spinnerValueSectionsId);
             }
 
@@ -128,19 +133,21 @@ public class ImportDataFragment extends Fragment {
 
     public void getSections(String classId) {
         sqLiteDatabase = studentDbHelper.getReadableDatabase();
-        cursor = studentDbHelper.getInformationFromSectionTable(sqLiteDatabase, classId);
+        cursor = studentDbHelper.getInformationFromSectionTableWithClassId(sqLiteDatabase, classId);
         if (cursor.moveToFirst()) {
             do {
-                classDataProviderList.add(new ClassDataProvider(String.valueOf(cursor.getInt(0))
+                sectionDataProviderList.add(new SectionDataProvider(String.valueOf(cursor.getInt(0))
                         , cursor.getString(1), cursor.getString(2), cursor.getString(3)));
             } while (cursor.moveToNext());
         }
+        setValueToSectionSpinner();
     }
 
-    public void getSectionsName(List<Section> sectionsLists) {
+
+    public void setValueToSectionSpinner() {
         List<String> sectionsNames = new ArrayList<>();
-        for (Section data : sectionsLists) {
-            sectionsNames.add(data.getSection());
+        for (SectionDataProvider data : sectionDataProviderList) {
+            sectionsNames.add(data.getSectionName());
         }
         android.widget.ArrayAdapter<String> ArrayAdapter = new ArrayAdapter
                 (getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, sectionsNames);
@@ -154,7 +161,7 @@ public class ImportDataFragment extends Fragment {
         ClientAPIs clientAPIs = retrofit.create(ClientAPIs.class);
         String base = userData.getUsername() + ":" + userData.getPassword();
         String authHeader = "Basic " + Base64.encodeToString(base.getBytes(), Base64.NO_WRAP);
-        Call<StudentDataList> call = clientAPIs.getStudents(classId, sectionsId, 5, 0, authHeader);
+        Call<StudentDataList> call = clientAPIs.getStudents(classId, sectionsId,5,0, authHeader);
         call.enqueue(new Callback<StudentDataList>() {
             @Override
             public void onResponse(Call<StudentDataList> call, Response<StudentDataList> response) {
@@ -165,6 +172,9 @@ public class ImportDataFragment extends Fragment {
                         studentDataList = studentsList.getStudentData();
                         Toast.makeText(getActivity(), "Students data fetched!", Toast.LENGTH_SHORT).show();
                         importButton.setEnabled(true);
+                    } else {
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), Values.DATA_ERROR, Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     progressDialog.dismiss();
@@ -178,6 +188,16 @@ public class ImportDataFragment extends Fragment {
                 Toast.makeText(getActivity(), Values.SERVER_ERROR, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void saveStudentsDataToDatabase() {
+        StudentDbHelper DBHelper = new StudentDbHelper(getActivity());
+        SQLiteDatabase sqLiteDatabase = DBHelper.getWritableDatabase();
+        for (StudentData data : studentDataList) {
+            DBHelper.addInformationToStudentTable(data.getStudentID(), data.getName(), data.getDob()
+                    , data.getSex(), data.getEmail(), data.getPhone(), data.getAddress(), data.getClassesID()
+                    , data.getSectionID(), data.getSection(), data.getParentID(), data.getStudentactive(), sqLiteDatabase);
+        }
     }
 
 
