@@ -178,7 +178,7 @@ public class GeneralSmsFragment extends Fragment {
             classesNames.add(data.getClassName());
         }
         android.widget.ArrayAdapter<String> ArrayAdapter = new ArrayAdapter
-                (getActivity(), android.R.layout.simple_spinner_item, classesNames);
+                (getActivity(), R.layout.spinner_text_view, classesNames);
         ArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         classesSpinner.setAdapter(ArrayAdapter);
     }
@@ -203,7 +203,7 @@ public class GeneralSmsFragment extends Fragment {
             sectionsNames.add(data.getSectionName());
         }
         android.widget.ArrayAdapter<String> ArrayAdapter = new ArrayAdapter
-                (getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, sectionsNames);
+                (getActivity().getApplicationContext(), R.layout.spinner_text_view, sectionsNames);
         ArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sectionsSpinner.setAdapter(ArrayAdapter);
     }

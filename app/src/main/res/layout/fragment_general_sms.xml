@@ -5,41 +5,52 @@
     tools:context="com.example.osamakhalid.simsadmin.ui.fragments.GeneralSmsFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="20dp"
             android:orientation="vertical">
-            <Spinner
-                android:id="@+id/import_classes_spinner"
-                android:layout_margin="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:background="@color/spinner_color"></Spinner>
 
-            <Spinner
-                android:id="@+id/import_sections_spinner"
-                android:layout_margin="20dp"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:background="@color/spinner_color"></Spinner>
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:background="@color/spinner_color">
+
+                <Spinner
+                    android:id="@+id/import_classes_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:popupBackground="@color/spinner_color"
+                    ></Spinner>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:background="@color/spinner_color">
+
+                <Spinner
+                    android:id="@+id/import_sections_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:popupBackground="@color/spinner_color"
+                    ></Spinner>
+            </RelativeLayout>
 
             <EditText
                 android:id="@+id/message_content"
-                android:layout_marginTop="20dp"
-                android:hint="Type message..."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:gravity="top|left"
+                android:hint="Type message..."
                 android:inputType="textMultiLine"
                 android:lines="8"
                 android:maxLines="10"
@@ -50,10 +61,9 @@
                 android:id="@+id/send_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Send"
-                android:layout_margin="20dp"
                 android:layout_gravity="right"
-                />
+                android:layout_margin="20dp"
+                android:text="Send" />
 
         </LinearLayout>
     </RelativeLayout>

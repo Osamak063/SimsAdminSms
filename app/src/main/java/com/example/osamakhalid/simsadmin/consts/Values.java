@@ -5,8 +5,8 @@ package com.example.osamakhalid.simsadmin.consts;
  */
 
 public class Values {
-    public static final String USER_CURL="ss_admin";
-    public static final String PASSWORD_CURL="12345";
+    public static final String USER_CURL = "ss_admin";
+    public static final String PASSWORD_CURL = "12345";
     public static final String DIALOGUE_MSG = "Loading...";
     public static final String SERVER_ERROR = "Server Error!";
     public static final String WAIT_MSG = "Please wait...";
@@ -17,5 +17,16 @@ public class Values {
     public static final String TYPE_STUDENT = "Student";
     public static final String TYPE_PARENT = "Parent";
     public static final String INVALID_USER_PASS = "Incorrect username or passoword";
-    public static final String SENDING_MSG= "Sending messages...";
+    public static final String SENDING_MSG = "Sending messages...";
+    public static final String DATE_FORMAT = "dd-mm-yyyy";
+    public static final String SICK_LEAVE = "Sick Leave";
+
+    public static String getAttendanceMessage(String studentName, String attendance) {
+        if (attendance.equals(SICK_LEAVE)) {
+            return studentName + " is on " + attendance + " today.";
+        } else {
+            return studentName + " is " + attendance + " today.";
+        }
+
+    }
 }
