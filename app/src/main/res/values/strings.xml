@@ -13,7 +13,18 @@
     <string name="tab_text_2">Attendance Sms</string>
     <string name="tab_text_3">Result Sms</string>
     <string name="tab_text_4">Fees Sms</string>
+    <string name="present_text">Present</string>
+    <string name="absent_text">Absent</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string-array name="attendance_array">
+        <item>Present</item>
+        <item>Absent</item>
+        <item>Sick Leave</item>
+        <item>Short Leave</item>
+        <item>Casual Leave</item>
+        <item>Emergency Leave</item>
+    </string-array>
+    <string name="date_format">dd-mm-yyyy</string>
 </resources>

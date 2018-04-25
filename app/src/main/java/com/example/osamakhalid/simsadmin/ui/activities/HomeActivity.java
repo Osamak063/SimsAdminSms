@@ -31,6 +31,7 @@ import com.example.osamakhalid.simsadmin.ui.fragments.AttendanceSmsFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.FeesSmsFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.GeneralSmsFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.ImportDataFragment;
+import com.example.osamakhalid.simsadmin.ui.fragments.MarkAttendanceFragment;
 import com.example.osamakhalid.simsadmin.ui.fragments.ResultSmsFragment;
 
 import java.util.ArrayList;
@@ -47,7 +48,8 @@ public class HomeActivity extends AppCompatActivity
         , AttendanceSmsFragment.OnFragmentInteractionListener
         , ResultSmsFragment.OnFragmentInteractionListener
         , FeesSmsFragment.OnFragmentInteractionListener
-        , ImportDataFragment.OnFragmentInteractionListener {
+        , ImportDataFragment.OnFragmentInteractionListener
+        ,MarkAttendanceFragment.OnFragmentInteractionListener    {
 
     LoginResponse userData;
     List<Class> classListItems;
@@ -242,6 +244,12 @@ public class HomeActivity extends AppCompatActivity
                     .replace(R.id.container_fragment, new ImportDataFragment())
                     .commit();
         }
+        else if(id==R.id.mark_attendance){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container_fragment, new MarkAttendanceFragment())
+                    .commit();
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -270,6 +278,11 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onImportFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onMarkFragmentInteraction(Uri uri) {
 
     }
 }

@@ -20,6 +20,16 @@ public class Values {
     public static final String SENDING_MSG = "Sending messages...";
     public static final String DATE_FORMAT = "dd-mm-yyyy";
     public static final String SICK_LEAVE = "Sick Leave";
+    public static final String ATTENDANCE_PRESENT_CODE = "P";
+    public static final String ATTENDANCE_ABSENT_CODE = "A";
+    public static final String ATTENDANCE_PRESENT_VALUE = "Present";
+    public static final String ATTENDANCE_ABSENT_VALUE = "Absent";
+    public static final String ATTENDANCE_SICK_LEAVE = "Sick Leave";
+    public static final String ATTENDANCE_CASUAL_LEAVE = "Casual Leave";
+    public static final String ATTENDANCE_EMERGENCY_LEAVE = "Emergency Leave";
+    public static final String ATTENDANCE_SHORT_LEAVE = "Short Leave";
+    public static final String ERROR_MARKING_ATTENDANCE = "Error in marking attendance";
+    public static final String SUCCESS_MARKING_ATTENDANCE = "Sucessfully marked attendace";
 
     public static String getAttendanceMessage(String studentName, String attendance) {
         if (attendance.equals(SICK_LEAVE)) {

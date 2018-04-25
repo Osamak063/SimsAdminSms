@@ -30,17 +30,17 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:background="@color/spinner_color">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:background="@color/spinner_color">
 
-                <Spinner
-                    android:id="@+id/attendance_sections_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:popupBackground="@color/spinner_color"></Spinner>
-            </RelativeLayout>
+            <Spinner
+                android:id="@+id/attendance_sections_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:popupBackground="@color/spinner_color"></Spinner>
+        </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

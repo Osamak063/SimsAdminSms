@@ -8,9 +8,13 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class StudentAttendance {
+
     @SerializedName("studentID")
     @Expose
     private String studentID;
+    @SerializedName("attendanceID")
+    @Expose
+    private String attendanceID;
     @SerializedName("photo")
     @Expose
     private String photo;
@@ -32,6 +36,9 @@ public class StudentAttendance {
     @SerializedName("atte_value")
     @Expose
     private String atteValue;
+    @SerializedName("day")
+    @Expose
+    private String day;
 
     public String getStudentID() {
         return studentID;
@@ -39,6 +46,14 @@ public class StudentAttendance {
 
     public void setStudentID(String studentID) {
         this.studentID = studentID;
+    }
+
+    public String getAttendanceID() {
+        return attendanceID;
+    }
+
+    public void setAttendanceID(String attendanceID) {
+        this.attendanceID = attendanceID;
     }
 
     public String getPhoto() {
@@ -95,5 +110,13 @@ public class StudentAttendance {
 
     public void setAtteValue(String atteValue) {
         this.atteValue = atteValue;
+    }
+
+    public String getDay() {
+        return day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
     }
 }

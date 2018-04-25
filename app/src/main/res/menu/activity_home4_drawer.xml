@@ -16,7 +16,9 @@
         <item
             android:id="@+id/fees_sms"
             android:title="Fees Sms" />
-
+        <item
+            android:id="@+id/mark_attendance"
+            android:title="Mark Attendance" />
     </group>
     <item android:title="Save data">
         <menu>

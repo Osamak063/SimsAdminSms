@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="5dp">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="#FFFFFFFF">
+
+        <LinearLayout
+            android:id="@+id/alertLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:weightSum="10">
+
+            <TextView
+                android:id="@+id/mark_attendance_roll_no1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="061"
+                android:textSize="@dimen/item_view_text_size" />
+
+            <TextView
+                android:id="@+id/mark_attendance_student_name1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:text="Osama Khalid"
+                android:textSize="@dimen/item_view_text_size" />
+
+            <RadioGroup
+                android:id="@+id/mark_attendance_radio_group_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="3"
+                >
+
+                <RadioButton
+                    android:id="@+id/mark_attendance_radio_button_present_item"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/present_text"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/mark_attendance_radio_button_absent_item"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/absent_text" />
+
+            </RadioGroup>
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

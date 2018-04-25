@@ -1,0 +1,145 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.osamakhalid.simsadmin.ui.fragments.MarkAttendanceFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="20dp"
+            android:weightSum="10">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:layout_marginRight="10dp"
+                android:background="@color/spinner_color">
+
+                <Spinner
+                    android:id="@+id/mark_attendance_classes_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:popupBackground="@color/spinner_color"></Spinner>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:layout_marginLeft="10dp"
+                android:background="@color/spinner_color">
+
+                <Spinner
+                    android:id="@+id/mark_attendance_sections_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:popupBackground="@color/spinner_color"></Spinner>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <Button
+                android:id="@+id/mark_attendance_select_date_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:backgroundTint="@color/spinner_color"
+                android:text="Select Date"
+                android:textAllCaps="false"
+                android:textColor="@color/white_color" />
+
+            <TextView
+                android:id="@+id/mark_attendance_date_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:padding="10dp"
+                android:text="@string/date_format"
+                android:textColor="@color/black_color"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:paddingStart="5dp"
+                android:text="Select all"
+                android:textColor="@color/black_color"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/mark_attendance_select_all_radio_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/mark_attendance_radio_button_present"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Present" />
+
+                <RadioButton
+                    android:id="@+id/mark_attendance_radio_button_absent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Absent" />
+
+            </RadioGroup>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/mark_attendance_students_list_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/mark_attendance_submit_button" />
+
+            <Button
+                android:id="@+id/mark_attendance_submit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_margin="10dp"
+                android:text="Submit"
+                android:textAllCaps="false"
+                android:visibility="gone" />
+        </RelativeLayout>
+    </LinearLayout>
+</FrameLayout>
